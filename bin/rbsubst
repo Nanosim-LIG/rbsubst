@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+RBS_BINDING = binding
+require 'stringio'
+require 'optparse'
+
+options = {:prefix => "#!RB!#", :string_marker => "EOF_RB"}
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: rbsubst [options] [file1 file2 ...]"
+  opts.separator <<EOF
+Process the standard input or given text files
+treating line starting by PREFIX as ruby script.
+Options:
+EOF
+  opts.on("-d", "--[no-]debug", "Print the generated script on standard error") do |v|
+    options[:debug] = v
+  end
+  opts.on("--prefix PREFIX", "Prefix to be used (default #{options[:prefix]})") do |prefix|
+    options[:prefix] = prefix
+  end
+  opts.on("--marker MARKER", "Marker to delimit strings (default #{options[:string_marker]})") do |marker|
+    options[:string_marker] = marker
+  end
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end
+parser.parse!
+
+prefix = options[:prefix]
+string_marker = options[:string_marker]
+
+prog_input = StringIO::new
+intext=false
+ARGF.each_line { |l|
+  if l.match(/\A\s*#{prefix}/) then
+    if intext then
+      prog_input.puts string_marker
+      intext = false
+    end
+    l = l.gsub(prefix,"")
+  else
+    if not intext then
+      prog_input.puts "print <<#{string_marker}"
+      intext = true
+    end
+  end
+  prog_input.print l
+}
+if intext then
+  prog_input.puts unless prog_input.string.end_with?("\n")
+  prog_input.puts string_marker if intext
+end
+
+if options[:debug] then
+  prog_input.rewind
+  STDERR.puts prog_input.read
+end
+
+prog_input.rewind
+eval(prog_input.read, RBS_BINDING)
