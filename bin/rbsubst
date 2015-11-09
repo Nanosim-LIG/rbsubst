@@ -7,8 +7,8 @@ options = {:prefix => "#!RB!#", :string_marker => "EOF_RB"}
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: rbsubst [options] [file1 file2 ...]"
   opts.separator <<EOF
-Process the standard input or given text files
-treating line starting by PREFIX as ruby script.
+Process the standard input or given text files treating lines starting by PREFIX
+as ruby script. Non ruby lines are treated using ruby string substitutions.
 Options:
 EOF
   opts.on("-d", "--[no-]debug", "Print the generated script on standard error") do |v|
