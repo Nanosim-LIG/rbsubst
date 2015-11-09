@@ -46,11 +46,9 @@ ARGF.each_line { |l|
     end
   end
   prog_input.print l
+  prog_input.puts unless l.end_with?("\n")
 }
-if intext then
-  prog_input.puts unless prog_input.string.end_with?("\n")
-  prog_input.puts string_marker if intext
-end
+prog_input.puts string_marker if intext
 
 if options[:debug] then
   prog_input.rewind
