@@ -1,3 +1,5 @@
+# rbsubst
+Use ruby as a preprocessor.
 Usage: rbsubst [options] [file1 file2 ...]
 Process the standard input or given text files
 treating line starting by PREFIX as ruby script.
